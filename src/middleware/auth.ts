@@ -7,12 +7,8 @@ interface JwtPayload {
   _id: string;
 }
 
-export interface authRequest extends Request {
-  user: UserType;
-  token: string;
-}
 
-const auth = async (req: authRequest, res: Response, next: NextFunction) => {
+const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.header("Authorization")!.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.SECRET!) as JwtPayload;
@@ -28,6 +24,8 @@ const auth = async (req: authRequest, res: Response, next: NextFunction) => {
 
     req.token = token;
     req.user = user;
+
+    console.log(req.user);
 
     next();
   } catch (error) {

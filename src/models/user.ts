@@ -16,7 +16,7 @@ interface UserModel extends mongoose.Model<UserType> {
   findByCredentials(email: string, password: string): Promise<UserType>;
 }
 
-const userSchema = new mongoose.Schema<UserType>({
+const UserSchema = new mongoose.Schema<UserType>({
   email: {
     type: String,
     required: true,
@@ -48,19 +48,19 @@ const userSchema = new mongoose.Schema<UserType>({
   ],
 });
 
-userSchema.pre(
-  "save",
-  async function (this: UserType, next: NextFunction) {
-    const user = this;
-    if (user.isModified("password")) {
-      user.password = await bcrypt.hash(user.password, 8);
-    }
+// UserSchema.pre(
+//   "save",
+//   async function (next: (error?: Error) => void) {
+//     const user = this;
+//     if (user.isModified("password")) {
+//       user.password = await bcrypt.hash(user.password, 8);
+//     }
 
-    next();
-  }
-);
+//     next();
+//   }
+// );
 
-userSchema.methods.generateAuthToken = async function () {
+UserSchema.methods.generateAuthToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET!);
   user.tokens = user.tokens.concat({ token });
@@ -69,7 +69,7 @@ userSchema.methods.generateAuthToken = async function () {
   return token;
 };
 
-userSchema.statics.findByCredentials = async (email, password) => {
+UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -85,6 +85,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 
-const User = mongoose.model<UserType, UserModel>("User", userSchema);
+const User = mongoose.model<UserType, UserModel>("User", UserSchema);
 
 export default User;

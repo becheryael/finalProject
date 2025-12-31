@@ -1,9 +1,9 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import { Router, Request, Response } from "express";
 const router: Router = express.Router();
 import User from "../models/user";
 import { StatusCodes } from "http-status-codes";
-import auth, { authRequest } from "../middleware/auth";
+import auth  from "../middleware/auth";
 
 // Create a new user
 router.post("", async (req: Request, res: Response) => {
@@ -31,12 +31,12 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Logout user
-router.post("/logout", auth, async (req: authRequest, res: Response) => {
+router.post("/logout", auth, async (req: Request, res: Response) => {
   try {
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token.token !== req.token;
-    });
-    await req.user.save();
+    // req.user!.tokens = req.user!.tokens.filter((token) => {
+    //   return token.token !== req.token;
+    // });
+    // await req.user!.save();
 
     res.send();
   } catch (error: any) {
