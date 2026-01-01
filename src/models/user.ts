@@ -3,11 +3,11 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { NextFunction } from "express";
 
-export interface UserType extends Document{
+export interface UserType extends Document {
   email: string;
   manager: boolean;
   password: string;
-  tokens: {token: string}[];
+  tokens: { token: string }[];
   generateAuthToken: () => Promise<string>;
   isModified: (password: string) => boolean;
 }
@@ -73,10 +73,16 @@ UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error("Unable to login");
+    throw new Error("Unable to login no user");
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  // const isMatch = await bcrypt.compare(password, user.password);
+  let isMatch: boolean;
+  if (password == user.password) {
+    isMatch = true;
+  } else {
+    isMatch = false
+  }
 
   if (!isMatch) {
     throw new Error("Unable to login");
