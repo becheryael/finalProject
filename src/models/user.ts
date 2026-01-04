@@ -1,9 +1,14 @@
 import mongoose, { Document } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import validator from "validator";
+
+
 import { NextFunction } from "express";
 
 export interface UserType extends Document {
+  name: string;
+  personalNum: string;
   email: string;
   manager: boolean;
   password: string;
@@ -17,11 +22,33 @@ interface UserModel extends mongoose.Model<UserType> {
 }
 
 const UserSchema = new mongoose.Schema<UserType>({
+  name: {
+    type: String,
+    require: true,
+    trim: true,
+  },
+  personalNum: {
+    type: String,
+    require: true,
+    trim: true,
+    unique: true,
+    validate(value: string) {
+      if (Number.isNaN(value) || value.length !== 7) {
+        throw new Error("Must contain seven digits");
+      }
+    },
+  },
   email: {
     type: String,
     required: true,
     trim: true,
     unique: true,
+
+    validate(value: string) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Must contain an email.");
+      }
+    },
   },
   manager: {
     type: Boolean,
@@ -33,9 +60,9 @@ const UserSchema = new mongoose.Schema<UserType>({
     minLength: 7,
     trim: true,
     validate(value: string) {
-      if (value.toLowerCase().includes("password")) {
-        throw new Error('Password cannot contain "Password".');
-      }
+   if (value.length < 7) {
+     throw new Error("Password must contain at least 7 characters.");
+   }
     },
   },
   tokens: [
