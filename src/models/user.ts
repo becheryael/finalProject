@@ -2,8 +2,6 @@ import mongoose, { Document } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
-
-
 import { NextFunction } from "express";
 
 export interface UserType extends Document {
@@ -21,11 +19,19 @@ interface UserModel extends mongoose.Model<UserType> {
   findByCredentials(email: string, password: string): Promise<UserType>;
 }
 
+const personalNumLength = 7;
+const passwordLength = 7;
+
 const UserSchema = new mongoose.Schema<UserType>({
   name: {
     type: String,
     require: true,
     trim: true,
+    validate(value: string) {
+      if (value === '') {
+        throw new Error(`Your name must contain at least one character.`);
+      }
+    },
   },
   personalNum: {
     type: String,
@@ -33,8 +39,12 @@ const UserSchema = new mongoose.Schema<UserType>({
     trim: true,
     unique: true,
     validate(value: string) {
-      if (Number.isNaN(value) || value.length !== 7) {
-        throw new Error("Must contain seven digits");
+      console.log(Number.isNaN(value));
+      if (Number.isNaN(value) || value.length !== personalNumLength) {
+        console.log("error");
+        throw new Error(
+          `Your personal number must contain exactly ${personalNumLength} digits.`
+        );
       }
     },
   },
@@ -46,7 +56,7 @@ const UserSchema = new mongoose.Schema<UserType>({
 
     validate(value: string) {
       if (!validator.isEmail(value)) {
-        throw new Error("Must contain an email.");
+        throw new Error("Your email must contain a valid email.");
       }
     },
   },
@@ -60,9 +70,11 @@ const UserSchema = new mongoose.Schema<UserType>({
     minLength: 7,
     trim: true,
     validate(value: string) {
-   if (value.length < 7) {
-     throw new Error("Password must contain at least 7 characters.");
-   }
+      if (value.length < passwordLength) {
+        throw new Error(
+          `Your password must contain at least ${passwordLength} characters.`
+        );
+      }
     },
   },
   tokens: [
@@ -100,7 +112,7 @@ UserSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error("Unable to login no user");
+    throw new Error("Unable to login");
   }
 
   // const isMatch = await bcrypt.compare(password, user.password);
