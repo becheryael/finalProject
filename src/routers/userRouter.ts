@@ -45,7 +45,7 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Logout user
-router.post("/logout:token", auth, async (req: Request, res: Response) => {
+router.post("/logout/:token", auth, async (req: Request, res: Response) => {
   try {
     req.user!.tokens = req.user!.tokens.filter((token) => {
       return token.token !== req.token;
