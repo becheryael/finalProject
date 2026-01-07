@@ -8,6 +8,7 @@ export interface UserType extends Document {
   name: string;
   personalNum: string;
   email: string;
+  avatar: string;
   manager: boolean;
   password: string;
   tokens: { token: string }[];
@@ -28,7 +29,7 @@ const UserSchema = new mongoose.Schema<UserType>({
     require: true,
     trim: true,
     validate(value: string) {
-      if (value === '') {
+      if (value === "") {
         throw new Error(`Your name must contain at least one character.`);
       }
     },
@@ -53,10 +54,23 @@ const UserSchema = new mongoose.Schema<UserType>({
     required: true,
     trim: true,
     unique: true,
-
     validate(value: string) {
       if (!validator.isEmail(value)) {
         throw new Error("Your email must contain a valid email.");
+      }
+    },
+  },
+  avatar: {
+    type: String,
+    default: "koala",
+    validate(value: string) {
+      if (
+        value !== "beaver" &&
+        value !== "deer" &&
+        value !== "koala" &&
+        value !== "raccoon"
+      ) {
+        throw new Error("Not a valid avatar.");
       }
     },
   },

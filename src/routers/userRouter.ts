@@ -65,7 +65,7 @@ router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
     console.log(req.body);
 
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "personalNum"];
+  const allowedUpdates = ["name", "email", "personalNum", "avatar"];
   const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
