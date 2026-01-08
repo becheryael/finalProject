@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User, { UserType } from "../models/user";
+import User from "../models/user";
 import { StatusCodes } from "http-status-codes";
 import type { NextFunction, Request, Response } from "express";
 
@@ -9,15 +9,13 @@ interface JwtPayload {
 
 const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const token = req.header("Authorization")!.replace("Bearer ", "");
-    const token = req.params.token;
-    // console.log(token)
+    const token = req.header("Authorization")!;
     const decoded = jwt.verify(token, process.env.SECRET!) as JwtPayload;
     const user = await User.findOne({
       _id: decoded._id,
-      "tokens.token": token,
+      "tokens.token": token
     });
-    
+
     if (!user) {
       throw new Error();
     }

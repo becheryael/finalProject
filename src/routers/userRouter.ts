@@ -1,5 +1,5 @@
 /// <reference path="../types/express.d.ts" />
-import express, { RequestHandler } from "express";
+import express from "express";
 import { Router, Request, Response } from "express";
 import User from "../models/user";
 import { StatusCodes } from "http-status-codes";
@@ -45,7 +45,7 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Logout user
-router.post("/logout/:token", auth, async (req: Request, res: Response) => {
+router.post("/logout", auth, async (req: Request, res: Response) => {
   try {
     req.user!.tokens = req.user!.tokens.filter((token) => {
       return token.token !== req.token;
@@ -60,7 +60,7 @@ router.post("/logout/:token", auth, async (req: Request, res: Response) => {
 export default router;
 
 // Update a user
-router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
+router.patch("/:id", auth, async (req: Request, res: Response) => {
   const userID = req.params.id;
   console.log(req.body);
 
@@ -92,7 +92,8 @@ router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
   }
 });
 
-router.post("/newToken/:token", auth, async (req: Request, res: Response) => {
+//Generate new user token
+router.post("/newToken", auth, async (req: Request, res: Response) => {
   try {
     const token = await req.user!.generateAuthToken();
     res.send({ user: req.user!, token });
