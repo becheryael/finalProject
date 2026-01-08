@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema<UserType>({
     trim: true,
     unique: true,
     validate(value: string) {
-      console.log(Number.isNaN(value));
+      // console.log(Number.isNaN(value));
       if (Number.isNaN(value) || value.length !== personalNumLength) {
         console.log("error");
         throw new Error(
@@ -115,7 +115,7 @@ const UserSchema = new mongoose.Schema<UserType>({
 
 UserSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET!);
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET!, {expiresIn: '600000'});
   user.tokens = user.tokens.concat({ token });
   await user.save();
 

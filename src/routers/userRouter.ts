@@ -12,11 +12,11 @@ router.post("/create", async (req: Request, res: Response) => {
   try {
     const email = req.body.email;
     const personalNum = req.body.personalNum;
-    const userByEmail = await User.findOne({ email });
+    const userByEmail = await User.exists({ email });
     if (userByEmail) {
       throw new Error("A user with this email already exists");
     }
-    const userByPersonalNum = await User.findOne({ personalNum });
+    const userByPersonalNum = await User.exists({ personalNum });
     if (userByPersonalNum) {
       throw new Error("A user with this personal number already exists");
     }
@@ -62,7 +62,7 @@ export default router;
 // Update a user
 router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
   const userID = req.params.id;
-    console.log(req.body);
+  console.log(req.body);
 
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "personalNum", "avatar"];
@@ -71,20 +71,16 @@ router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
   );
 
   if (!isValidOperation) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .send("invalid updates");
+    return res.status(StatusCodes.BAD_REQUEST).send("invalid updates");
   }
 
   try {
     const user = await User.findById(userID);
-
     if (!user) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .send("This user does not exist in database");
     }
-    // updates.forEach((update) => (user[update] = req.body[update]));
     updates.forEach((update) => {
       user.set(update, req.body[update]);
     });
@@ -92,7 +88,15 @@ router.patch("/:id/:token", auth, async (req: Request, res: Response) => {
     await user.save();
     res.send(user);
   } catch (error: any) {
-    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+  }
+});
+
+router.post("/newToken/:token", auth, async (req: Request, res: Response) => {
+  try {
+    const token = await req.user!.generateAuthToken();
+    res.send({ user: req.user!, token });
+  } catch (error: any) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error.message);
   }
 });
