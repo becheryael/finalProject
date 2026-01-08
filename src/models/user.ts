@@ -20,8 +20,8 @@ interface UserModel extends mongoose.Model<UserType> {
   findByCredentials(email: string, password: string): Promise<UserType>;
 }
 
-const personalNumLength = 7;
-const passwordLength = 7;
+const PERSONAL_NUM_LENGTH = 7;
+const PASSWORD_LENGTH = 7;
 
 const UserSchema = new mongoose.Schema<UserType>({
   name: {
@@ -40,11 +40,11 @@ const UserSchema = new mongoose.Schema<UserType>({
     trim: true,
     unique: true,
     validate(value: string) {
-      // console.log(Number.isNaN(value));
-      if (Number.isNaN(value) || value.length !== personalNumLength) {
+      console.log(Number.isNaN(value));
+      if (Number.isNaN(value) || value.length !== PERSONAL_NUM_LENGTH) {
         console.log("error");
         throw new Error(
-          `Your personal number must contain exactly ${personalNumLength} digits.`
+          `Your personal number must contain exactly ${PERSONAL_NUM_LENGTH} digits.`
         );
       }
     },
@@ -84,9 +84,9 @@ const UserSchema = new mongoose.Schema<UserType>({
     minLength: 7,
     trim: true,
     validate(value: string) {
-      if (value.length < passwordLength) {
+      if (value.length < PASSWORD_LENGTH) {
         throw new Error(
-          `Your password must contain at least ${passwordLength} characters.`
+          `Your password must contain at least ${PASSWORD_LENGTH} characters.`
         );
       }
     },
